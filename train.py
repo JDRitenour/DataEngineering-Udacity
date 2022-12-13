@@ -21,6 +21,14 @@ from sklearn.model_selection import GridSearchCV
 
 
 def load_data():
+    """
+    Loads the data from the DisasterResponse sqlite database.
+
+    Returns:
+        X: the messages to be classified
+        y: columns with the classification options
+        labels: the columns headers of the classification options
+    """
     engine = create_engine('sqlite:///DisasterResponse.db')
     df = pd.read_sql_table('DisasterResponse', engine)
     X = df['message']
@@ -30,6 +38,7 @@ def load_data():
 
 
 def tokenize(text):
+    """tokenizes the disaster response messages for training"""
     # remove special characters prior to tokenization
     text_cleaned = re.sub('[^A-Za-z0-9]+', ' ', text.lower().strip())
 
@@ -55,6 +64,7 @@ def tokenize(text):
 
 
 def build_model():
+    """Builds the model."""
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -71,6 +81,14 @@ def build_model():
 
 
 def model_results(y_test, y_pred, labels):
+    """
+    Prints the results of the model
+
+    Parameters:
+        y_test: the actual classifications from the test set
+        y_pred: the predicted classifications from the model
+        labels: the column names for the classifications
+    """
     for i in range(len(labels)):
         print('Category: {} '.format(labels[i]))
         print(classification_report(y_test.iloc[:, i].values, y_pred[:, i]))

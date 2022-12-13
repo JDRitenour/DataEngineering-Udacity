@@ -23,6 +23,8 @@ categories.columns = category_colnames
 for column in categories:
     # set each value to be the last character of the string
     categories[column] = categories[column].apply(lambda x: x[-1])
+    # replace any value of '2' with a value of '1'
+    categories[column] = categories[column].str.replace('2', '1')
     # convert column from string to numeric
     categories[column] = categories[column].astype('int64')
 
@@ -37,4 +39,4 @@ df.drop_duplicates(inplace=True)
 
 # load to sqlite database
 engine = create_engine('sqlite:///DisasterResponse.db')
-df.to_sql('DisasterResponse', engine, index=False)
+df.to_sql('DisasterResponse', engine, index=False, if_exists='replace')

@@ -7,12 +7,14 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
 from flask import Flask
-from flask import render_template, request, jsonify
+from flask import render_template, request
+from flask_cors import CORS
 from plotly.graph_objs import Bar
 from sqlalchemy import create_engine
 
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"orgins": "*"}})
 
 
 def tokenize(text):
@@ -32,7 +34,7 @@ engine = create_engine('sqlite:///DisasterResponse.db')
 df = pd.read_sql_table('DisasterResponse', engine)
 
 # load model
-model = joblib.load("model.pkl")
+model = joblib.load('model.pkl')
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -44,6 +46,9 @@ def index():
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+    related_counts = df.groupby('related').count()['message']
+    related_names = list(related_counts.index)
+
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -63,6 +68,24 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=related_names,
+                    y=related_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Related Messages',
+                'yaxis': {
+                    'title': 'Count'
+                },
+                'xaxis': {
+                    'title': 'Related'
                 }
             }
         }
